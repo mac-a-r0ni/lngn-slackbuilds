@@ -1,0 +1,19 @@
+# HOW TO EDIT THIS FILE:
+# The "handy ruler" below makes it easier to edit a package description.
+# Line up the first '|' above the ':' following the base package name, and
+# the '|' on the right side marks the last column you can put a character in.
+# You must make exactly 11 lines for the formatting to be correct.  It's also
+# customary to leave one space after the ':' except on otherwise blank lines.
+
+      |-----handy-ruler------------------------------------------------------|
+mtools: mtools (MS-DOS disk utils)
+mtools:
+mtools: Mtools is a collection of utilities to access MS-DOS disks from GNU
+mtools: and Unix without mounting them. It supports Win'95 style long file
+mtools: names, OS/2 Xdf disks and 2m disks (store up to 1992k on a high
+mtools: density 3 1/2 disk). In addition to file access, it supports many
+mtools: FAT-specific features: volume labels, FAT-specific file attributes
+mtools: (hidden, system, ...), "bad block" map maintenance, access to remote
+mtools: floppy drives, Iomega ZIP disk protection, "secure" erase, display
+mtools: of file's on-disk layout, etc.
+mtools: Homepage: https://www.gnu.org/software/mtools/
