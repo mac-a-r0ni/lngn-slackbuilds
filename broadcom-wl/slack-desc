@@ -6,13 +6,14 @@
 # customary to leave one space after the ':' except on otherwise blank lines.
 
            |-----handy-ruler------------------------------------------------------|
-file-roller: File Roller (GNOME archive manager)
-file-roller:
-file-roller: File Roller is an archive manager for GNOME with support for tar,
-file-roller: bzip2, gzip, zip, jar, compress, lzop and many other archive formats.
-file-roller:
-file-roller: Homepage: https://wiki.gnome.org/Apps/FileRoller
-file-roller:
-file-roller:
-file-roller:
-file-roller:
+broadcom-wl: broadcom-wl (Broadcom wireless kernel module)
+broadcom-wl:
+broadcom-wl: Proprietary driver for Broadcom's BCM4311, BCM4312, BCM4313, BCM4321,
+broadcom-wl: BCM4322, BCM43142, BCM43224, BCM43225, BCM43227, BCM43228, BCM4331,
+broadcom-wl: BCM4360 and BCM4352 wireless network cards. Includes a kernel module
+broadcom-wl: named 'wl'.
+broadcom-wl:
+broadcom-wl: For more information, see:
+broadcom-wl: https://www.broadcom.com/support/802.11
+broadcom-wl:
+broadcom-wl:

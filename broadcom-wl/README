@@ -1,4 +1,4 @@
-The broadcom-sta package includes the kernel module 'wl', which contains
+The broadcom-wl package includes the kernel module 'wl', which contains
 a Broadcom-provided proprietary kernel driver known to support the
 listed chipsets.
 
@@ -26,10 +26,10 @@ proprietary driver.
 To build the module for a kernel that isn't currently running on the
 system, pass that kernel's "uname -r" output such as:
 
-    KERNEL=4.4.67 ./broadcom-sta.SlackBuild
+    KERNEL=4.4.67 ./broadcom-wl.SlackBuild
 
-If you would like to name your interface wlan0 instead of eth1, either
+If you would like to name your interface eth1 instead of wlan0, either
 rename the device in /etc/udev/rules.d/70-persistent-net.rules or build
 the package with:
 
-    IFNAME=wlan ./broadcom-sta.SlackBuild
+    IFNAME=eth ./broadcom-wl.SlackBuild

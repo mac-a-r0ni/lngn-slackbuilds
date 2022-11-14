@@ -1,6 +1,8 @@
 #!/bin/sh
 
-# Slackware build script for broadcom-sta
+# Slackware build script for broadcom-wl
+# Casually changed the name of the package to match all other distros
+# name so there is no confusion on _what_ this package is for.
 
 # Copyright 2015-2019 Andreas Voegele <andreas@andreasvoegele.com>
 #
@@ -16,10 +18,10 @@
 # ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
 # OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 
-PRGNAM=broadcom-sta
+PRGNAM=broadcom-wl
 VERSION=${VERSION:-6.30.223.271}
 BUILD=${BUILD:-1}
-TAG=${TAG:-_sln}
+TAG=${TAG:-_lngn}
 
 KERNEL=${KERNEL:-$( uname -r )}
 IFNAME=${IFNAME:-wlan}
@@ -33,7 +35,7 @@ if [ -z "$ARCH" ]; then
 fi
 
 CWD=$(pwd)
-TMP=${TMP:-/tmp/sln}
+TMP=${TMP:-/tmp/lngn}
 PKG=$TMP/package-$PRGNAM
 OUTPUT=${OUTPUT:-/tmp}
 
@@ -69,13 +71,12 @@ find -L . \
 if [ "$IFNAME" != "eth" ]; then
   sed -i "/BRCM_WLAN_IFNAME/s/eth/$IFNAME/" src/wl/sys/wl_linux.c
 fi
-# NEW PATCHES STOLEN FROM ARCH
+
 patch -p1 < $CWD/patches/001-null-pointer-fix.patch || exit 1
 patch -p1 < $CWD/patches/002-rdtscl.patch || exit 1
 patch -p1 < $CWD/patches/003-linux47.patch || exit 1
 patch -p1 < $CWD/patches/004-linux48.patch || exit 1
 patch -p1 < $CWD/patches/005-debian-fix-kernel-warnings.patch || exit 1
-patch -p2 < $CWD/patches/05-remove-time-and-date-macros.patch || exit 1
 patch -p1 < $CWD/patches/006-linux411.patch || exit 1
 patch -p1 < $CWD/patches/007-linux412.patch || exit 1
 patch -p1 < $CWD/patches/008-linux415.patch || exit 1
@@ -84,27 +85,7 @@ patch -p1 < $CWD/patches/010-linux56.patch || exit 1
 patch -p1 < $CWD/patches/011-linux59.patch || exit 1
 patch -p1 < $CWD/patches/012-linux517.patch || exit 1
 patch -p1 < $CWD/patches/013-linux518.patch || exit 1
-
-# OLD PATCHES
-#patch -p2 < $CWD/patches/04-user_ioctl.patch
-#patch -p2 < $CWD/patches/05-remove-time-and-date-macros.patch
-#patch -p2 < $CWD/patches/13-broadcom-sta-6.30.223.248-linux-3.18-null-pointer-crash.patch
-#patch -p2 < $CWD/patches/14-rdtscl.patch
-#patch -p2 < $CWD/patches/15-linux47.patch
-#if [ -n "${KERNEL##[23].*}" -a -n "${KERNEL##4.[0-6].*}" ]; then
-#  sed -i.orig 's/IEEE80211_BAND_\([25]\)GHZ/NL80211_BAND_\1GHZ/g' \
-#    src/wl/sys/wl_cfg80211_hybrid.c
-#fi
-#patch -p2 < $CWD/patches/16-linux48.patch
-#patch -p2 < $CWD/patches/17-fix-kernel-warnings.patch
-#patch -p2 < $CWD/patches/18-linux411.patch
-#patch -p2 < $CWD/patches/19-linux412.patch
-#patch -p2 < $CWD/patches/20-linux414.patch
-#patch -p2 < $CWD/patches/21-linux415.patch
-#patch -p2 < $CWD/patches/22-linux56.patch
-#patch -p1 < $CWD/patches/013-linux518.patch
-#patch -p1 < $CWD/patches/009-fix_mac_profile_discrepancy.patch
-#patch -p2 < $CWD/patches/23-get-rid-of-get_fs-set_fs-calls.patch
+patch -p2 < $CWD/patches/014-remove-time_date-macros.patch || exit 1
 
 # See https://lkml.org/lkml/2019/3/1/643
 sed -i 's/get_ds()/KERNEL_DS/g' src/wl/sys/wl_iw.c

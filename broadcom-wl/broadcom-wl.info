@@ -1,4 +1,4 @@
-PRGNAM="broadcom-sta"
+PRGNAM="broadcom-wl"
 VERSION="6.30.223.271"
 HOMEPAGE="https://www.broadcom.com/support/802.11"
 DOWNLOAD="https://docs.broadcom.com/docs-and-downloads/docs/linux_sta/README_6.30.223.271.txt \
