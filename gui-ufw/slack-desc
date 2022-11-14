@@ -6,14 +6,14 @@
 # customary to leave one space after the ':'.
 
        |-----handy-ruler------------------------------------------------------|
-gui-ufw: gui-ufw
+gui-ufw: gui-ufw (gui frontend for the ufw firewall)
 gui-ufw:
 gui-ufw: gui-ufw is a graphical frontend to popular firewall software ufw.
 gui-ufw:
+gui-ufw: Homepage: http://gufw.org
 gui-ufw:
 gui-ufw:
 gui-ufw:
 gui-ufw:
 gui-ufw:
-gui-ufw: http://gufw.org/
 gui-ufw:

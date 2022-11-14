@@ -29,7 +29,7 @@
 PRGNAM=ufw
 VERSION=${VERSION:-0.36.1}
 BUILD=${BUILD:-1}
-TAG=${TAG:-_sln}
+TAG=${TAG:-_lngn}
 
 if [ -z "$ARCH" ]; then
   case "$( uname -m )" in
@@ -40,7 +40,7 @@ if [ -z "$ARCH" ]; then
 fi
 
 CWD=$(pwd)
-TMP=${TMP:-/tmp/jbl}
+TMP=${TMP:-/tmp/lngn}
 PKG=$TMP/package-$PRGNAM
 OUTPUT=${OUTPUT:-/tmp}
 
