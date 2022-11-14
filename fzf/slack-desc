@@ -10,7 +10,7 @@ fzf: fzf (A command-line fuzzy finder written in Go)
 fzf:
 fzf: fzf is a general-purpose command-line fuzzy finder.
 fzf:
-fzf: https://github.com/junegunn/fzf
+fzf: Homepage: https://github.com/junegunn/fzf
 fzf:
 fzf:
 fzf:
