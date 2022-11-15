@@ -23,9 +23,10 @@
 #  ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 PRGNAM=pika-backup
-VERSION=${VERSION:-v0.4.1}
+#VERSION=${VERSION:-$(echo $PRGNAM-*.tar.?z | rev | cut -f 3- -d . | cut -f 1 -d - | rev)}
+VERSION=${VERSION:-0.4.2}
 BUILD=${BUILD:-1}
-TAG=${TAG:-_SBo}
+TAG=${TAG:-_lngn}
 PKGTYPE=${PKGTYPE:-txz}
 
 if [ -z "$ARCH" ]; then
@@ -42,7 +43,7 @@ if [ ! -z "${PRINT_PACKAGE_NAME}" ]; then
 fi
 
 CWD=$(pwd)
-TMP=${TMP:-/tmp/SBo}
+TMP=${TMP:-/tmp/lngn}
 PKG=$TMP/pkg-$PRGNAM
 OUTPUT=${OUTPUT:-/tmp}
 JOBS=${JOBS:-" -j$(expr $(nproc) + 1) "}
@@ -56,6 +57,9 @@ elif [ "$ARCH" = "i686" ]; then
 elif [ "$ARCH" = "x86_64" ]; then
   SLKCFLAGS="-O2 -fPIC"
   LIBDIRSUFFIX="64"
+elif [ "$ARCH" = "aarch64" ]; then
+  SLKCFLAGS="-O2 -fPIC"
+  LIBDIRSUFFIX="64"
 else
   SLKCFLAGS="-O2"
   LIBDIRSUFFIX=""
@@ -63,26 +67,26 @@ fi
 
 set -e
 
-#rm -rf $PKG
+rm -rf $PKG
 mkdir -p $TMP $PKG $OUTPUT
 cd $TMP
-#rm -rf $PRGNAM-$VERSION
-tar xfv $CWD/$PRGNAM-$VERSION.tar.?z*
-cd $PRGNAM-$VERSION
+rm -rf $PRGNAM-v$VERSION
+tar xfv $CWD/$PRGNAM-v$VERSION.tar.?z*
+cd $PRGNAM-v$VERSION
 
-#chown -R root:root .
-#find -L . \
-# \( -perm 777 -o -perm 775 -o -perm 750 -o -perm 711 -o -perm 555 \
-#  -o -perm 511 \) -exec chmod 755 {} \; -o \
-# \( -perm 666 -o -perm 664 -o -perm 640 -o -perm 600 -o -perm 444 \
-#  -o -perm 440 -o -perm 400 \) -exec chmod 644 {} \;
+chown -R root:root .
+find -L . \
+ \( -perm 777 -o -perm 775 -o -perm 750 -o -perm 711 -o -perm 555 \
+  -o -perm 511 \) -exec chmod 755 {} \; -o \
+ \( -perm 666 -o -perm 664 -o -perm 640 -o -perm 600 -o -perm 444 \
+  -o -perm 440 -o -perm 400 \) -exec chmod 644 {} \;
 
 mkdir -p build
 cd build
 
 CFLAGS="$SLKCFLAGS" \
 CXXFLAGS="$SLKCFLAGS" \
-meson .. \
+meson setup .. \
  --prefix=/usr \
  --buildtype=release \
  --libdir=lib${LIBDIRSUFFIX} \
@@ -95,11 +99,11 @@ meson .. \
 
 ninja $JOBS || ninja
 DESTDIR=$PKG ninja install
+
+cd ..
+
 find $PKG -print0 | xargs -0 file | grep -e "executable" -e "shared object" | grep ELF \
   | cut -f 1 -d : | xargs strip --strip-unneeded 2> /dev/null || true
-
-find $PKG/usr/man -type f -exec gzip -9 {} \;
-for i in $( find $PKG/usr/man -type l ) ; do ln -s $( readlink $i ).gz $i.gz ; rm $i ; done
 
 find $PKG -name '*.la' -delete
 
