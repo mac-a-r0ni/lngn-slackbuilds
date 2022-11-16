@@ -82,7 +82,8 @@ mkdir -p $TMP $PKG $OUTPUT
 cd $TMP
 
 rm -rf $PRGNAM-v$VERSION
-tar xvf $CWD/$PRGNAM-v$VERSION.tar.bz2
+#homemade archive since the release is missing spice-common subproject
+tar xvf $CWD/$PRGNAM-v$VERSION.tar.xz
 cd $PRGNAM-v$VERSION
 chown -R root:root .
 find -L . \
@@ -91,20 +92,27 @@ find -L . \
  \( -perm 666 -o -perm 664 -o -perm 640 -o -perm 600 -o -perm 444 \
   -o -perm 440 -o -perm 400 \) -exec chmod 644 {} \;
 
-CFLAGS="$SLKCFLAGS" \
-CXXFLAGS="$SLKCFLAGS" \
-./autogen.sh \
-./configure \
+# Configure, build, and install:
+export CFLAGS="$SLKCFLAGS"
+export CXXFLAGS="$SLKCFLAGS"
+mkdir meson-build
+cd meson-build
+meson setup \
   --prefix=/usr \
   --libdir=/usr/lib${LIBDIRSUFFIX} \
-  --docdir=/usr/doc/$PRGNAM-$VERSION \
-  --disable-static \
-  --enable-client \
-  --disable-celt051 \
-  --build=$ARCH-slackware-linux
+  --libexecdir=/usr/libexec \
+  --bindir=/usr/bin \
+  --sbindir=/usr/sbin \
+  --includedir=/usr/include \
+  --datadir=/usr/share \
+  --mandir=/usr/man \
+  --sysconfdir=/etc \
+  --localstatedir=/var \
+  --buildtype=release
 
-make
-make install DESTDIR=$PKG
+ninja -j5
+DESTDIR=$PKG ninja install
+cd ..
 
 find $PKG -print0 | xargs -0 file | grep -e "executable" -e "shared object" | grep ELF \
   | cut -f 1 -d : | xargs strip --strip-unneeded 2> /dev/null || true

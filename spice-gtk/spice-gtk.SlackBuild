@@ -25,9 +25,9 @@
 cd $(dirname $0) ; CWD=$(pwd)
 
 PRGNAM=spice-gtk
-VERSION=${VERSION:-0.40}
+VERSION=${VERSION:-0.41}
 BUILD=${BUILD:-1}
-TAG=${TAG:-_jbl}
+TAG=${TAG:-_lngn}
 PKGTYPE=${PKGTYPE:-txz}
 
 if [ -z "$ARCH" ]; then
@@ -46,7 +46,7 @@ if [ ! -z "${PRINT_PACKAGE_NAME}" ]; then
   exit 0
 fi
 
-TMP=${TMP:-/tmp/jbl}
+TMP=${TMP:-/tmp/lngn}
 PKG=$TMP/package-$PRGNAM
 OUTPUT=${OUTPUT:-/tmp}
 
@@ -57,6 +57,9 @@ elif [ "$ARCH" = "i686" ]; then
   SLKCFLAGS="-O2 -march=i686 -mtune=i686"
   LIBDIRSUFFIX=""
 elif [ "$ARCH" = "x86_64" ]; then
+  SLKCFLAGS="-O2 -fPIC"
+  LIBDIRSUFFIX="64"
+elif [ "$ARCH" = "aarch64" ]; then
   SLKCFLAGS="-O2 -fPIC"
   LIBDIRSUFFIX="64"
 else
@@ -71,7 +74,7 @@ if pkg-config --exists libphodav-2.0; then phodav="en"; else phodav="dis"; fi
 
 DOCS="AUTHORS CHANGELOG.md COPYING README.md"
 
-set -e 
+set -e
 
 rm -rf $PKG
 mkdir -p $TMP $PKG $OUTPUT
@@ -104,8 +107,16 @@ meson setup \
   --sysconfdir=/etc \
   --localstatedir=/var \
   --buildtype=release \
-  -D gtk_doc=disabled \
-  -D usb-ids-path=/usr/share/hwdata/usb.ids \
+  -Dgtk_doc=disabled \
+  -Dusb-ids-path=/usr/share/hwdata/usb.ids \
+  -Dgtk=enabled \
+  -Dwayland-protocols=enabled \
+  -Dwebdav=disabled \
+  -Dusbredir=enabled \
+  -Dpolkit=enabled \
+  -Dintrospection=enabled \
+  -Dvapi=enabled \
+  -Dgtk_doc=disabled \
   .. || exit 1
   "${NINJA:=ninja}" || exit 1
   DESTDIR=$PKG $NINJA install || exit 1
