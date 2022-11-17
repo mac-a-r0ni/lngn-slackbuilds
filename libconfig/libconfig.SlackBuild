@@ -1,8 +1,9 @@
 #!/bin/bash
 
-# Slackware build script for sboui
+# Slackware build script for libconfig
 
-# Copyright 2022 | Daniel Prosser | Lexington Park, MD
+# Copyright 2017 Manuel Argüelles <manuel.arguelles@gmail.com>
+# Copyright 2017-2018 Jason Graham <jgraha8@gmail.com>
 # All rights reserved.
 #
 # Redistribution and use of this script, with or without modification, is
@@ -24,8 +25,8 @@
 
 cd $(dirname $0) ; CWD=$(pwd)
 
-PRGNAM=sboui
-VERSION=${VERSION:-2.3}
+PRGNAM=libconfig
+VERSION=${VERSION:-1.7.3}
 BUILD=${BUILD:-1}
 TAG=${TAG:-_lngn}
 PKGTYPE=${PKGTYPE:-txz}
@@ -67,6 +68,9 @@ else
   LIBDIRSUFFIX=""
 fi
 
+DOC=${DOC:-no}
+EXAMPLES=${EXAMPLES:-no}
+
 set -e
 
 rm -rf $PKG
@@ -82,57 +86,51 @@ find -L . \
  \( -perm 666 -o -perm 664 -o -perm 640 -o -perm 600 -o -perm 444 \
   -o -perm 440 -o -perm 400 \) -exec chmod 644 {} \;
 
-# Build options
-USE_NINJA="${USE_NINJA:-yes}"
-GRAPHICAL_SU="${GRAPHICAL_SU:-kdesu}"
-TERMINAL_EMULATOR="${TERMINAL_EMULATOR:-kgx}"
-INSTALL_SYSTRAY_NOTIFIER="${INSTALL_SYSTRAY_NOTIFIER:-no}"
-if [ "$USE_NINJA" == "yes" ]; then
-  GENERATOR="Ninja"
-  BUILDCMD="ninja"
-else
-  GENERATOR="Unix Makefiles"
-  BUILDCMD="make"
-fi
-if [ "$INSTALL_SYSTRAY_NOTIFIER" == "yes" ]; then
-  NOTIFIER="ON"
-else
-  NOTIFIER="OFF"
-fi
+autoreconf -if
 
-mkdir -p build
-cd build
-  cmake \
-    -DCMAKE_C_FLAGS:STRING="$SLKCFLAGS" \
-    -DCMAKE_CXX_FLAGS:STRING="$SLKCFLAGS" \
-    -DCMAKE_INSTALL_PREFIX:PATH=/usr \
-    -DCMAKE_BUILD_TYPE:STRING="Release" \
-    -DGRAPHICAL_SU:STRING="$GRAPHICAL_SU" \
-    -DTERMINAL_EMULATOR:STRING="$TERMINAL_EMULATOR" \
-    -DINSTALL_SYSTRAY_NOTIFIER:BOOL="$NOTIFIER" \
-    -G "$GENERATOR" ..
-  $BUILDCMD
-  DESTDIR=$PKG $BUILDCMD install
-cd ..
+CFLAGS="$SLKCFLAGS" \
+CXXFLAGS="$SLKCFLAGS" \
+./configure \
+  --prefix=/usr \
+  --libdir=/usr/lib${LIBDIRSUFFIX} \
+  --sysconfdir=/etc \
+  --localstatedir=/var \
+  --mandir=/usr/man \
+  --infodir=/usr/info \
+  --docdir=/usr/doc/$PRGNAM-$VERSION \
+  --disable-static \
+  --disable-examples \
+  --build=$ARCH-slackware-linux
+
+make
+make install DESTDIR=$PKG
 
 find $PKG -print0 | xargs -0 file | grep -e "executable" -e "shared object" | grep ELF \
   | cut -f 1 -d : | xargs strip --strip-unneeded 2> /dev/null || true
 
-find $PKG/usr/man -type f -exec gzip -9 {} \;
-for i in $( find $PKG/usr/man -type l ) ; do ln -s $( readlink $i ).gz $i.gz ; rm $i ; done
-
-mv $PKG/etc/sboui/sboui.conf $PKG/etc/sboui/sboui.conf.new
-mv $PKG/etc/sboui/sboui-backend.conf $PKG/etc/sboui/sboui-backend.conf.new
-mv $PKG/etc/sboui/blacklist $PKG/etc/sboui/blacklist.new
+rm -f $PKG/usr/info/dir
+gzip -9 $PKG/usr/info/*.info*
 
 mkdir -p $PKG/usr/doc/$PRGNAM-$VERSION
-cp -a AUTHORS ChangeLog INSTALL LICENSE README.md \
+cp -a AUTHORS COPYING.LIB INSTALL ChangeLog NEWS README TODO  \
   $PKG/usr/doc/$PRGNAM-$VERSION
 cat $CWD/$PRGNAM.SlackBuild > $PKG/usr/doc/$PRGNAM-$VERSION/$PRGNAM.SlackBuild
 
+if [ "${DOC}" = "yes" ]; then
+    make html pdf
+    cp -a doc/libconfig.{html,pdf} $PKG/usr/doc/$PRGNAM-$VERSION/
+fi
+
+if [ "${EXAMPLES}" = "yes" ]; then
+    mkdir -p $PKG/usr/doc/$PRGNAM-$VERSION/examples/{c,c++}
+    cp -a examples/c/*.{cfg,c} $PKG/usr/doc/$PRGNAM-$VERSION/examples/c/
+    cp -a examples/c++/*.{cfg,cpp} $PKG/usr/doc/$PRGNAM-$VERSION/examples/c++/
+fi
+
+rm -f $PKG/usr/lib*/*.la
+
 mkdir -p $PKG/install
 cat $CWD/slack-desc > $PKG/install/slack-desc
-cat $CWD/doinst.sh > $PKG/install/doinst.sh
 
 cd $PKG
 /sbin/makepkg -l y -c n $OUTPUT/$PRGNAM-$VERSION-$ARCH-$BUILD$TAG.$PKGTYPE
