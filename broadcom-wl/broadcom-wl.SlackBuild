@@ -72,6 +72,7 @@ if [ "$IFNAME" != "eth" ]; then
   sed -i "/BRCM_WLAN_IFNAME/s/eth/$IFNAME/" src/wl/sys/wl_linux.c
 fi
 
+patch -p2 < $CWD/patches/000-remove-time_date-macros.patch || exit 1
 patch -p1 < $CWD/patches/001-null-pointer-fix.patch || exit 1
 patch -p1 < $CWD/patches/002-rdtscl.patch || exit 1
 patch -p1 < $CWD/patches/003-linux47.patch || exit 1
@@ -85,7 +86,8 @@ patch -p1 < $CWD/patches/010-linux56.patch || exit 1
 patch -p1 < $CWD/patches/011-linux59.patch || exit 1
 patch -p1 < $CWD/patches/012-linux517.patch || exit 1
 patch -p1 < $CWD/patches/013-linux518.patch || exit 1
-patch -p2 < $CWD/patches/014-remove-time_date-macros.patch || exit 1
+patch -p1 < $CWD/patches/014-linux414.patch || exit 1
+patch -p1 < $CWD/patches/015-linux600.patch || exit 1
 
 # See https://lkml.org/lkml/2019/3/1/643
 sed -i 's/get_ds()/KERNEL_DS/g' src/wl/sys/wl_iw.c
@@ -101,7 +103,7 @@ mkdir -p $PKG/etc/modprobe.d
 cat $CWD/b43_blacklist.conf.new > $PKG/etc/modprobe.d/b43_blacklist.conf.new
 
 mkdir -p $PKG/usr/doc/$PRGNAM-$VERSION
-cp -a lib/LICENSE.txt $CWD/README $PKG/usr/doc/$PRGNAM-$VERSION
+cp -a lib/LICENSE.txt $PKG/usr/doc/$PRGNAM-$VERSION
 cat $CWD/$PRGNAM.SlackBuild > $PKG/usr/doc/$PRGNAM-$VERSION/$PRGNAM.SlackBuild
 
 mkdir -p $PKG/install
