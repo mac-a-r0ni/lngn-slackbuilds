@@ -22,6 +22,8 @@
 #  OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF
 #  ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
+wget -c https://releases.pagure.org/libosinfo/libosinfo-1.10.0.tar.xz
+
 cd $(dirname $0) ; CWD=$(pwd)
 
 PRGNAM=libosinfo
