@@ -4,12 +4,12 @@
 
 # Written by Wainamoinen <wainamoinen@gmail.com>
 
-wget -c https://github.com/numactl/numactl/releases/download/v2.0.13/numactl-2.0.13.tar.gz
+wget -c https://github.com/numactl/numactl/releases/download/v2.0.16/numactl-2.0.16.tar.gz
 
 cd $(dirname $0) ; CWD=$(pwd)
 
 PRGNAM=numactl
-VERSION=${VERSION:-2.0.13}
+VERSION=${VERSION:-$(echo $PRGNAM-*.tar.?z | rev | cut -f 3- -d . | cut -f 1 -d - | rev)}
 BUILD=${BUILD:-1}
 TAG=${TAG:-_lngn}
 PKGTYPE=${PKGTYPE:-txz}
