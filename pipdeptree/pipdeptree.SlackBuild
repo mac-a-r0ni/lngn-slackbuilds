@@ -1,7 +1,8 @@
 #!/bin/bash
 
-# Slackware build script for usbredir
-# Copyright 2013-2021 Matteo Bernardini <ponce@slackbuilds.org>, Pisa, Italy
+# Slackware build script for pipdeptree
+
+# Copyright 2014-2022  Dimitris Zlatanidis  Orestiada, Greece
 # All rights reserved.
 #
 # Redistribution and use of this script, with or without modification, is
@@ -23,8 +24,8 @@
 
 cd $(dirname $0) ; CWD=$(pwd)
 
-PRGNAM=usbredir-usbredir
-VERSION=${VERSION:-0.13.0}
+PRGNAM=pipdeptree
+VERSION=${VERSION:-2.2.1}
 BUILD=${BUILD:-1}
 TAG=${TAG:-_lngn}
 PKGTYPE=${PKGTYPE:-txz}
@@ -66,15 +67,13 @@ else
   LIBDIRSUFFIX=""
 fi
 
-DOCS="COPYING* README* TODO"
-
 set -e
 
 rm -rf $PKG
 mkdir -p $TMP $PKG $OUTPUT
 cd $TMP
 rm -rf $PRGNAM-$VERSION
-tar xvf $CWD/$PRGNAM-$VERSION.tar.?z*
+tar xvf $CWD/$PRGNAM-$VERSION.tar.gz
 cd $PRGNAM-$VERSION
 chown -R root:root .
 find -L . \
@@ -83,39 +82,17 @@ find -L . \
  \( -perm 666 -o -perm 664 -o -perm 640 -o -perm 600 -o -perm 444 \
   -o -perm 440 -o -perm 400 \) -exec chmod 644 {} \;
 
-mkdir build
-cd build
-  CFLAGS="$SLKCFLAGS" \
-  CXXFLAGS="$SLKCFLAGS" \
-  meson .. \
-    --buildtype=release \
-    --infodir=/usr/info \
-    --libdir=/usr/lib${LIBDIRSUFFIX} \
-    --localstatedir=/var \
-    --mandir=/usr/man \
-    --prefix=/usr \
-    --sysconfdir=/etc
-  ninja
-  DESTDIR=$PKG ninja install
-cd ..
-
-rm -rf $PKG/usr/lib${LIBDIRSUFFIX}/*.la
+python3 setup.py install --root=$PKG
 
 find $PKG -print0 | xargs -0 file | grep -e "executable" -e "shared object" | grep ELF \
   | cut -f 1 -d : | xargs strip --strip-unneeded 2> /dev/null || true
 
-find $PKG/usr/man -type f -exec gzip -9 {} \;
-  for i in $( find $PKG/usr/man -type l ) ; do ln -s $( readlink $i ).gz $i.gz ; rm $i ; done
-
 mkdir -p $PKG/usr/doc/$PRGNAM-$VERSION
-cp -a $DOCS $PKG/usr/doc/$PRGNAM-$VERSION
-cat $CWD/usbredir.SlackBuild > $PKG/usr/doc/$PRGNAM-$VERSION/usbredir.SlackBuild
+cp -a PKG-INFO README.rst $PKG/usr/doc/$PRGNAM-$VERSION
+cat $CWD/$PRGNAM.SlackBuild > $PKG/usr/doc/$PRGNAM-$VERSION/$PRGNAM.SlackBuild
 
 mkdir -p $PKG/install
 cat $CWD/slack-desc > $PKG/install/slack-desc
 
 cd $PKG
 /sbin/makepkg -l y -c n $OUTPUT/$PRGNAM-$VERSION-$ARCH-$BUILD$TAG.$PKGTYPE
-
-cd $OUTPUT
-mv $PRGNAM-$VERSION-$ARCH-$BUILD$TAG.$PKGTYPE usbredir-$VERSION-$ARCH-$BUILD$TAG.$PKGTYPE
