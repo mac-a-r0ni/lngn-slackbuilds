@@ -1,0 +1,36 @@
+yajl
+(numactl)
+(libvirt)
+(libvirt-glib)
+(libvirt-python)
+gtk-vnc
+(spice-protocol)
+(spice)
+usbredir
+(spice-gtk)
+(device-tree-compiler)
+[libnfs] skipped
+(snappy)
+[vde2] skipped
+virglrenderer
+qemu
+virt-manager
+libcacard
+phodav
+
+spice-protocol
+pcsc-lite
+libcacard
+spice
+phodav
+spice-gtk
+device-tree-compiler
+libslirp
+qemu
+libvirt
+libvirt-python
+libvirt-glib
+osinfo-db-tools
+osinfo-db
+libosinfo
+virt-manager

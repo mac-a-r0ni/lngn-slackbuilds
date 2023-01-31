@@ -97,7 +97,8 @@ cd build
     --localstatedir=/var \
     --mandir=/usr/man \
     --prefix=/usr \
-    --sysconfdir=/etc
+    --sysconfdir=/etc \
+    -Dvideo=true
   "${NINJA:=ninja}"
   DESTDIR=$PKG $NINJA install
 cd ..
