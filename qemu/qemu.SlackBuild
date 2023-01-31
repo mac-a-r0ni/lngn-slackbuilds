@@ -138,6 +138,8 @@ CXXFLAGS="$SLKCFLAGS" \
   --enable-jemalloc \
   --enable-nettle \
   --enable-spice \
+  --enable-smartcard \
+  --enable-opengl \
   --${uring}able-linux-io-uring \
   --audio-drv-list=${AUDIODRIVERS} \
   $with_slirp \
