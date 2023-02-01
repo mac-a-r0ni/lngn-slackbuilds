@@ -140,6 +140,10 @@ CXXFLAGS="$SLKCFLAGS" \
   --enable-spice \
   --enable-smartcard \
   --enable-opengl \
+  --enable-virglrenderer \
+  --enable-vte \
+  --enable-snappy \
+  --enable-spice-protocol \
   --${uring}able-linux-io-uring \
   --audio-drv-list=${AUDIODRIVERS} \
   $with_slirp \
