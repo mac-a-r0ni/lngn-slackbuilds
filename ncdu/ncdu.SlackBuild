@@ -22,12 +22,12 @@
 # OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF
 # ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-wget -c https://dev.yorhel.nl/download/ncdu-1.17.tar.gz
+wget -c https://dev.yorhel.nl/download/ncdu-1.18.tar.gz
 
 cd $(dirname $0) ; CWD=$(pwd)
 
 PRGNAM=ncdu
-VERSION=${VERSION:-1.17}
+VERSION=${VERSION:-1.18}
 BUILD=${BUILD:-1}
 TAG=${TAG:-_lngn}
 PKGTYPE=${PKGTYPE:-txz}
