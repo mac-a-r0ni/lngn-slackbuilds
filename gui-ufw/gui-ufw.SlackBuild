@@ -89,6 +89,21 @@ mkdir -p $PKG/usr/man/man8
 mv $PKG/usr/share/man/man8/gufw.8 $PKG/usr/man/man8
 rm -R $PKG/usr/share/man
 
+# Compress and link manpages, if any:
+if [ -d $PKG/usr/man ]; then
+  ( cd $PKG/usr/man
+    for manpagedir in $(find . -type d -name "man*") ; do
+      ( cd $manpagedir
+        for eachpage in $( find . -type l -maxdepth 1) ; do
+          ln -s $( readlink $eachpage ).gz $eachpage.gz
+          rm $eachpage
+        done
+        gzip -9 *.*
+      )
+    done
+  )
+fi
+
 find $PKG -print0 | xargs -0 file | grep -e "executable" -e "shared object" | grep ELF \
   | cut -f 1 -d : | xargs strip --strip-unneeded 2> /dev/null || true
 
