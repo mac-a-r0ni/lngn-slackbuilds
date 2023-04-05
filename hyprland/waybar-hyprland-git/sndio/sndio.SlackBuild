@@ -1,8 +1,8 @@
 #!/bin/bash
 
-# Slackware build script for jsoncpp
+# Slackware build script for sndio
 
-# Copyright 2014-2020 Larry Hajali <larryhaja[at]gmail[dot]com>
+# Copyright 2023 Jay Lanagan (j@lngn.net), Detroit, MI, USA.
 # All rights reserved.
 #
 # Redistribution and use of this script, with or without modification, is
@@ -22,12 +22,13 @@
 #  OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF
 #  ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-wget -c https://github.com/open-source-parsers/jsoncpp/archive/1.9.5/jsoncpp-1.9.5.tar.gz
+# You must add a 'sndiod' account
+useradd -r -g audio -s /sbin/nologin -d /var/run/sndiod sndiod
 
 cd $(dirname $0) ; CWD=$(pwd)
 
-PRGNAM=jsoncpp
-VERSION=${VERSION:-1.9.5}
+PRGNAM=sndio
+VERSION=${VERSION:-$(echo $PRGNAM-*.tar.?z | rev | cut -f 3- -d . | cut -f 1 -d - | rev)}
 BUILD=${BUILD:-1}
 TAG=${TAG:-_lngn}
 PKGTYPE=${PKGTYPE:-txz}
@@ -75,7 +76,7 @@ rm -rf $PKG
 mkdir -p $TMP $PKG $OUTPUT
 cd $TMP
 rm -rf $PRGNAM-$VERSION
-tar xvf $CWD/$PRGNAM-$VERSION.tar.gz
+tar xvf $CWD/$PRGNAM-$VERSION.tar.?z
 cd $PRGNAM-$VERSION
 chown -R root:root .
 find -L . \
@@ -84,31 +85,75 @@ find -L . \
  \( -perm 666 -o -perm 664 -o -perm 640 -o -perm 600 -o -perm 444 \
   -o -perm 440 -o -perm 400 \) -exec chmod 644 {} \;
 
-mkdir -p build
-cd build
-  CXXFLAGS="$SLKCFLAGS -std=c++11" \
-  meson setup \
-    --prefix=/usr \
-    --libdir=lib${LIBDIRSUFFIX} \
-    --bindir=/usr/bin \
-    --includedir=/usr/include/$PRGNAM \
-    --buildtype=release \
-    --default-library=shared \
-    ..
+CFLAGS="$SLKCFLAGS" \
+CXXFLAGS="$SLKCFLAGS" \
+./configure \
+  --prefix=/usr \
+  --libdir=/usr/lib${LIBDIRSUFFIX} \
+  --pkgconfdir=/usr/lib${LIBDIRSUFFIX}/pkgconfig \
+  --mandir=/usr/man
 
-  "${NINJA:=ninja}"
-  DESTDIR=$PKG $NINJA install
-cd ..
+make $NUMJOBS || make || exit 1
+make install DESTDIR=$PKG || exit 1
 
 find $PKG -print0 | xargs -0 file | grep -e "executable" -e "shared object" | grep ELF \
   | cut -f 1 -d : | xargs strip --strip-unneeded 2> /dev/null || true
 
+rm -rf $PKG/usr/lib${LIBDIRSUFFIX}/*.la
+# Remove all these symlinks preventing manpages to be gzipped
+# we'll replace them with the included doinst.sh later
+rm -rf $PKG/usr/man/man3/mio_close.3
+rm -rf $PKG/usr/man/man3/mio_eof.3
+rm -rf $PKG/usr/man/man3/mio_nfds.3
+rm -rf $PKG/usr/man/man3/mio_pollfd.3
+rm -rf $PKG/usr/man/man3/mio_read.3
+rm -rf $PKG/usr/man/man3/mio_revents.3
+rm -rf $PKG/usr/man/man3/mio_write.3
+rm -rf $PKG/usr/man/man3/sio_close.3
+rm -rf $PKG/usr/man/man3/sio_eof.3
+rm -rf $PKG/usr/man/man3/sio_getcap.3
+rm -rf $PKG/usr/man/man3/sio_getpar.3
+rm -rf $PKG/usr/man/man3/sio_initpar.3
+rm -rf $PKG/usr/man/man3/sio_nfds.3
+rm -rf $PKG/usr/man/man3/sio_onmove.3
+rm -rf $PKG/usr/man/man3/sio_onvol.3
+rm -rf $PKG/usr/man/man3/sio_pollfd.3
+rm -rf $PKG/usr/man/man3/sio_read.3
+rm -rf $PKG/usr/man/man3/sio_revents.3
+rm -rf $PKG/usr/man/man3/sio_setpar.3
+rm -rf $PKG/usr/man/man3/sio_setvol.3
+rm -rf $PKG/usr/man/man3/sio_start.3
+rm -rf $PKG/usr/man/man3/sio_stop.3
+rm -rf $PKG/usr/man/man3/sio_write.3
+rm -rf $PKG/usr/man/man3/sioctl_close.3
+rm -rf $PKG/usr/man/man3/sioctl_eof.3
+rm -rf $PKG/usr/man/man3/sioctl_nfds.3
+rm -rf $PKG/usr/man/man3/sioctl_ondesc.3
+rm -rf $PKG/usr/man/man3/sioctl_onval.3
+rm -rf $PKG/usr/man/man3/sioctl_pollfd.3
+rm -rf $PKG/usr/man/man3/sioctl_revents.3
+rm -rf $PKG/usr/man/man3/sioctl_setval.3
+
+# library needs this folder to operate so we'll create it during install
+mkdir -p $PKG/var/run/sndiod
+
+# user-changable defaults file
+mkdir -p $PKG/etc/default
+cp $TMP/$PRGNAM-$VERSION/contrib/default.sndiod $PKG/etc/default/sndiod
+
+# init script, user must ensure chmod +x to start upon boot
+mkdir -p $PKG/etc/rc.d
+cp $TMP/$PRGNAM-$VERSION/contrib/init.d.sndiod $PKG/etc/rc.d/rc.sndiod
+
+gzip -9 $PKG/usr/man/man*/*
+
+# There's no actual documentation included
 mkdir -p $PKG/usr/doc/$PRGNAM-$VERSION
-cp -a AUTHORS LICENSE README.md $PKG/usr/doc/$PRGNAM-$VERSION
 cat $CWD/$PRGNAM.SlackBuild > $PKG/usr/doc/$PRGNAM-$VERSION/$PRGNAM.SlackBuild
 
 mkdir -p $PKG/install
 cat $CWD/slack-desc > $PKG/install/slack-desc
+cat $CWD/doinst.sh > $PKG/install/doinst.sh
 
 cd $PKG
 /sbin/makepkg -l y -c n $OUTPUT/$PRGNAM-$VERSION-$ARCH-$BUILD$TAG.$PKGTYPE

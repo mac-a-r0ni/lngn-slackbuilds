@@ -1,8 +1,6 @@
 #!/bin/bash
 
-# Slackware build script for jsoncpp
-
-# Copyright 2014-2020 Larry Hajali <larryhaja[at]gmail[dot]com>
+# Copyright 2022, marav, Paris, FR
 # All rights reserved.
 #
 # Redistribution and use of this script, with or without modification, is
@@ -11,7 +9,7 @@
 # 1. Redistributions of this script must retain the above copyright
 #    notice, this list of conditions and the following disclaimer.
 #
-#  THIS SOFTWARE IS PROVIDED BY THE AUTHOR "AS IS" AND ANY EXPRESS OR IMPLIED
+#  THIS SOFTWARE IS PROVIDED BY THE AUTHOR ``AS IS'' AND ANY EXPRESS OR IMPLIED
 #  WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF
 #  MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED.  IN NO
 #  EVENT SHALL THE AUTHOR BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
@@ -22,12 +20,10 @@
 #  OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF
 #  ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-wget -c https://github.com/open-source-parsers/jsoncpp/archive/1.9.5/jsoncpp-1.9.5.tar.gz
-
 cd $(dirname $0) ; CWD=$(pwd)
 
-PRGNAM=jsoncpp
-VERSION=${VERSION:-1.9.5}
+PRGNAM=wireplumber
+VERSION=${VERSION:-0.4.14}
 BUILD=${BUILD:-1}
 TAG=${TAG:-_lngn}
 PKGTYPE=${PKGTYPE:-txz}
@@ -40,9 +36,6 @@ if [ -z "$ARCH" ]; then
   esac
 fi
 
-# If the variable PRINT_PACKAGE_NAME is set, then this script will report what
-# the name of the created package would be, and then exit. This information
-# could be useful to other scripts.
 if [ ! -z "${PRINT_PACKAGE_NAME}" ]; then
   echo "$PRGNAM-$VERSION-$ARCH-$BUILD$TAG.$PKGTYPE"
   exit 0
@@ -72,43 +65,84 @@ fi
 set -e
 
 rm -rf $PKG
-mkdir -p $TMP $PKG $OUTPUT
+mkdir -p $TMP $PKG
 cd $TMP
 rm -rf $PRGNAM-$VERSION
-tar xvf $CWD/$PRGNAM-$VERSION.tar.gz
-cd $PRGNAM-$VERSION
+tar xvf $CWD/$PRGNAM-$VERSION.tar.?z || exit 1
+cd $PRGNAM-$VERSION || exit 1
 chown -R root:root .
-find -L . \
- \( -perm 777 -o -perm 775 -o -perm 750 -o -perm 711 -o -perm 555 \
-  -o -perm 511 \) -exec chmod 755 {} \; -o \
- \( -perm 666 -o -perm 664 -o -perm 640 -o -perm 600 -o -perm 444 \
-  -o -perm 440 -o -perm 400 \) -exec chmod 644 {} \;
+find . \
+  \( -perm 777 -o -perm 775 -o -perm 711 -o -perm 555 -o -perm 511 \) \
+  -exec chmod 755 {} \+ -o \
+  \( -perm 666 -o -perm 664 -o -perm 600 -o -perm 444 -o -perm 440 -o -perm 400 \) \
+  -exec chmod 644 {} \+
 
-mkdir -p build
-cd build
-  CXXFLAGS="$SLKCFLAGS -std=c++11" \
-  meson setup \
-    --prefix=/usr \
-    --libdir=lib${LIBDIRSUFFIX} \
-    --bindir=/usr/bin \
-    --includedir=/usr/include/$PRGNAM \
-    --buildtype=release \
-    --default-library=shared \
-    ..
+# Set options to build with or without documentation / introspection
+# These options are disabled by default
+WITHDOC=${WITHDOC:-no}
+WITHINTROSPEC=${WITHINTROSPEC:-yes}
 
+if [ $WITHDOC  == "no" ]; then
+  DOC_OPTION="-Ddoc=disabled"
+  else
+  DOC_OPTION="-Ddoc=auto"
+fi
+
+if  [ $WITHINTROSPEC ==  "no" ]; then
+  INTROSPEC_OPTION="-Dintrospection=disabled"
+  else
+  INTROSPEC_OPTION="-Dintrospection=auto"
+fi
+
+# Configure, build, and install:
+export CFLAGS="$SLKCFLAGS"
+export CXXFLAGS="$SLKCFLAGS"
+mkdir meson-build
+cd meson-build
+meson setup \
+  --prefix=/usr \
+  --libdir=lib${LIBDIRSUFFIX} \
+  --libexecdir=/usr/libexec \
+  --bindir=/usr/bin \
+  --sbindir=/usr/sbin \
+  --includedir=/usr/include \
+  --datadir=/usr/share \
+  --mandir=/usr/man \
+  -Dsystem-lua=true \
+  -Dsystemd=disabled \
+  -Dsystemd-user-service=false \
+  $DOC_OPTION \
+  $INTROSPEC_OPTION \
+  ..
   "${NINJA:=ninja}"
   DESTDIR=$PKG $NINJA install
 cd ..
 
-find $PKG -print0 | xargs -0 file | grep -e "executable" -e "shared object" | grep ELF \
-  | cut -f 1 -d : | xargs strip --strip-unneeded 2> /dev/null || true
+# Add sample configuation files:
+mkdir -p $PKG/etc/xdg/autostart
+cp -a $CWD/wireplumber.desktop.sample $PKG/etc/xdg/autostart
+chown root:root $PKG/etc/xdg/autostart/*
+chmod 644 $PKG/etc/xdg/autostart/*
+
+mkdir -p $PKG/usr/sbin
+cp -a $CWD/wireplumber-disable.sh $PKG/usr/sbin
+cp -a $CWD/wireplumber-enable.sh $PKG/usr/sbin
+chown root:root $PKG/usr/sbin/wireplumber-disable.sh $PKG/usr/sbin/wireplumber-enable.sh
+chmod 755 $PKG/usr/sbin/wireplumber-disable.sh $PKG/usr/sbin/wireplumber-enable.sh
+
+# Strip binaries:
+find $PKG | xargs file | grep -e "executable" -e "shared object" | grep ELF | cut -f 1 -d : | xargs strip --strip-unneeded 2> /dev/null
 
 mkdir -p $PKG/usr/doc/$PRGNAM-$VERSION
-cp -a AUTHORS LICENSE README.md $PKG/usr/doc/$PRGNAM-$VERSION
+cp -a \
+  LICENSE NEWS.rst README.rst \
+  $PKG/usr/doc/$PRGNAM-$VERSION
 cat $CWD/$PRGNAM.SlackBuild > $PKG/usr/doc/$PRGNAM-$VERSION/$PRGNAM.SlackBuild
 
 mkdir -p $PKG/install
 cat $CWD/slack-desc > $PKG/install/slack-desc
+cat $CWD/doinst.sh > $PKG/install/doinst.sh
 
 cd $PKG
 /sbin/makepkg -l y -c n $OUTPUT/$PRGNAM-$VERSION-$ARCH-$BUILD$TAG.$PKGTYPE
+
