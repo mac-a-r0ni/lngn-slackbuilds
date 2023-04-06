@@ -5,15 +5,15 @@
 # You must make exactly 11 lines for the formatting to be correct.  It's also
 # customary to leave one space after the ':' except on otherwise blank lines.
 
-               |-----handy-ruler------------------------------------------------------|
-waybar-hyprland: waybar-hyprland (bar for wlroots based compositors)
-waybar-hyprland:
-waybar-hyprland: waybar is a highly customizable Wayland bar for Sway and Wlroots
-waybar-hyprland: based compositors.
-waybar-hyprland:
-waybar-hyprland: Homepage: https://github.com/Alexays/waybar
-waybar-hyprland:
-waybar-hyprland:
-waybar-hyprland:
-waybar-hyprland:
-waybar-hyprland:
+                           |-----handy-ruler------------------------------------------------------|
+xdg-desktop-portal-hyprland: xdg-desktop-portal-hyprland (XDG backend for hyprland)
+xdg-desktop-portal-hyprland:
+xdg-desktop-portal-hyprland: Due to reasons explained in hyprland-protocols, we have a separate
+xdg-desktop-portal-hyprland: desktop portal impl for Hyprland. Although -wlr does work with
+xdg-desktop-portal-hyprland: Hyprland, -hyprland offers more features.
+xdg-desktop-portal-hyprland:
+xdg-desktop-portal-hyprland: Homepage: https://github.com/hyprwm/xdg-desktop-portal-hyprland
+xdg-desktop-portal-hyprland:
+xdg-desktop-portal-hyprland:
+xdg-desktop-portal-hyprland:
+xdg-desktop-portal-hyprland:
