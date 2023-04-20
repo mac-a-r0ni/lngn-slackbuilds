@@ -22,8 +22,6 @@
 #  OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF
 #  ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-wget -c https://github.com/hyprwm/xdg-desktop-portal-hyprland/archive/refs/tags/v0.2.1.tar.gz
-
 cd $(dirname $0) ; CWD=$(pwd)
 
 PRGNAM=xdg-desktop-portal-hyprland
@@ -81,6 +79,8 @@ find -L . \
  \( -perm 666 -o -perm 664 -o -perm 640 -o -perm 600 -o -perm 444 \
   -o -perm 440 -o -perm 400 \) -exec chmod 644 {} \;
 
+# to submit this to SBo I either need to have a pkg for the protocols or bundle a specific git pull when shipping
+# preferrable to make a pkg if we have a stable release by then.
 git clone https://github.com/hyprwm/hyprland-protocols $TMP/$PRGNAM-$VERSION/subprojects/hyprland-protocols
 
 mkdir meson-build
@@ -123,11 +123,6 @@ if [ -d $PKG/usr/man ]; then
     done
   )
 fi
-
-find $PKG -name perllocal.pod \
-  -o -name ".packlist" \
-  -o -name "*.bs" \
-  | xargs rm -f
 
 mkdir -p $PKG/usr/doc/$PRGNAM-$VERSION
 cp -a  CONTRIBUTING.md LICENSE README.md $PKG/usr/doc/$PRGNAM-$VERSION
